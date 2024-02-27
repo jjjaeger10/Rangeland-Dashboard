@@ -41,3 +41,11 @@ lpi_long <- lpi_long %>%
   dplyr::mutate(Plot_Type = if_else(stringr::str_detect(Plot, "Grass"), "Grass",
                             if_else(stringr::str_detect(Plot, "Open"), "Open Conifer",
                             if_else(stringr::str_detect(Plot, "Sage"), "Sagebrush", "Tall Forb"))))
+
+# add factor if plot is an exclosure
+lpi_long <- lpi_long %>%
+  dplyr::mutate(Exclosure = if_else(str_detect(Plot, "Ex"), 1, 0))
+
+# extract plot number
+lpi_long <- lpi_long %>%
+  dplyr::mutate(Plot_Name = as.numeric(stringr::str_extract_all(Plot, "[0-9]+")))
