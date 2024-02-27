@@ -5,12 +5,12 @@ library(lubridate)
 library(stringr)
 
 # load data
-biomass <- read.csv(paste0(getwd(), "/data/biomass.csv"))
-floral <- read.csv(paste0(getwd(), "/data/floral_density.csv"))
-lpi <- read.csv(paste0(getwd(), "/data/master_foliar.csv"))
-bt <- read.csv(paste0(getwd(), "/data/belt_transect.csv"))
-rb <- read.csv(paste0(getwd(), "/data/robel_mean.csv"))
-lpi_bg <- read.csv(paste0(getwd(), "/data/lpi_bg.csv"))
+biomass <- read.csv("./data/biomass.csv")
+floral <- read.csv("./data/floral_density.csv")
+lpi <- read.csv("./data/master_foliar.csv")
+bt <- read.csv("./data/belt_transect.csv")
+rb <- read.csv("./data/robel_mean.csv")
+lpi_bg <- read.csv("./data/lpi_bg.csv")
 
 # convert dates to date objects and add separate columns for just year and month
 
