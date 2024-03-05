@@ -1,0 +1,251 @@
+---
+title: "R_shinytest"
+author: "Joshua J. Jaeger"
+date: "2024-03-01"
+output: html_document
+---
+
+```{r Test out an R Shiny}
+
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(aplpack)
+library(stringr)
+library(forcats)
+library(lubridate)
+library(shiny)
+
+LPI_shiny <-  read.csv("SR_LPI_MasterFoliar_FunctionalPercent.csv")
+
+LPI_shiny2 <- LPI_shiny %>% 
+  select(-c(1)) %>% 
+  group_by(Plot, Date, PlotType, Location, Year, Inout, max_points, TotalHits, Total_Percent_Cover) %>% 
+  pivot_longer(cols= FNA:FIB, names_to = "Functional_Group", values_to = "Percent_Cover")
+
+
+# Use a fluid Bootstrap layout
+ui <- fluidPage(    
+  
+  # Give the page a title
+  titlePanel("Total Percent Foliar Cover by Plot Type"),
+  
+  # Generate a row with a sidebar
+  sidebarLayout(      
+    
+    # Define the sidebar with one input
+    sidebarPanel(
+      selectInput("PlotType", "Select the Plot Type:", 
+                  choices=c("GRS","SAGE","PTF","OC"), 
+                  selected = "GRS")
+    ),
+    
+    # Create a spot for the barplot
+    mainPanel(
+      plotOutput("FunctionalPlot")  
+    )
+    
+  )
+)
+
+# Define a server for the Shiny app
+server <- function(input, output) {
+  
+  reactive_data = reactive({
+    selected_plottype = input$PlotType
+    return(LPI_shiny[LPI_shiny$PlotType==selected_plottype,])
+    
+  })
+  
+  # Fill in the spot we created for a plot
+  output$FunctionalPlot <- renderPlot({
+    
+    our_data <- reactive_data()
+    
+    # Render a barplot
+    barplot(Total_Percent_Cover ~ Year + Location, data = our_data, 
+            main=input$PlotType,
+            ylab="Percent Cover",
+            xlab="Location")
+  })
+}
+
+# Create Shiny app ----
+shinyApp(ui = ui, server = server)
+
+```
+
+```{r Test out an R Shiny with ggplot}
+
+# Use a fluid Bootstrap layout
+ui <- fluidPage(    
+  
+  # Give the page a title
+  titlePanel("Percent Foliar Cover by Plot Type"),
+  
+  # Generate a row with a sidebar
+  sidebarLayout(      
+    
+    # Define the sidebar with one input
+    sidebarPanel(
+      selectInput(inputId = "PlotType", 
+                  label = "Select the Plot Type:", 
+                  choices=c("GRS","SAGE","PTF","OC"), 
+                  selected = "GRS"),
+    ),
+    
+    # Create a spot for the barplot
+    mainPanel(
+      plotOutput("FunctionalPlot")  
+    )
+    
+  )
+)
+
+# Define a server for the Shiny app
+server <- function(input, output) {
+  
+  reactive_data = reactive({
+    selected_plottype = input$PlotType
+    return(LPI_shiny2[LPI_shiny2$PlotType==selected_plottype,])
+    
+  })
+  
+
+  # Fill in the spot we created for a plot
+  output$FunctionalPlot <- renderPlot({
+    
+    our_data <- reactive_data()
+    
+    # Render a barplot
+    ggplot(data=our_data, mapping = aes(x=Location, y=Percent_Cover, fill = Functional_Group)) + 
+      geom_bar(stat="identity") + 
+      theme_bw() + 
+      theme(axis.text.x=element_text (angle =45, hjust =1)) 
+  
+           })
+}
+
+# Create Shiny app ----
+shinyApp(ui = ui, server = server)
+
+```
+
+```{r Test out an R Shiny with ggplot and custom fill scale}
+
+# Use a fluid Bootstrap layout
+ui <- fluidPage(    
+  
+  # Give the page a title
+  titlePanel("Percent Foliar Cover by Plot Type"),
+  
+  # Generate a row with a sidebar
+  sidebarLayout(      
+    
+    # Define the sidebar with one input
+    sidebarPanel(
+      selectInput(inputId = "PlotType", 
+                  label = "Select the Plot Type:", 
+                  choices=c("GRS","SAGE","PTF","OC"), 
+                  selected = "GRS"),
+    ),
+    
+    # Create a spot for the barplot
+    mainPanel(
+      plotOutput("FunctionalPlot")  
+    )
+    
+  )
+)
+
+# Define a server for the Shiny app
+server <- function(input, output) {
+  
+  reactive_data = reactive({
+    selected_plottype = input$PlotType
+    return(LPI_shiny2[LPI_shiny2$PlotType==selected_plottype,])
+    
+  })
+  
+
+  # Fill in the spot we created for a plot
+  output$FunctionalPlot <- renderPlot({
+    
+    our_data <- reactive_data()
+    
+    # Render a barplot
+    ggplot(data=our_data, mapping = aes(x=Location, y=Percent_Cover, fill = Functional_Group)) + 
+      geom_bar(stat="identity") + 
+      theme_bw() + 
+      theme(axis.text.x=element_text (angle =45, hjust =1)) +
+      scale_fill_manual(values = c("black", "coral3", "#7570B3", "#1B9E77",
+                             "#E6AB02", "#E7298A", "#CAFF70", "blue",
+                             "#A6761D","#666666","#66A61E","orange",
+                             "#4682B4","red","#D2B48C", "#7CCD7C",
+                             "brown"))
+  
+           })
+}
+
+# Create Shiny app ----
+shinyApp(ui = ui, server = server)
+
+```
+
+```{r Test out an R Shiny with ggplot and facetwrap}
+
+# Use a fluid Bootstrap layout
+ui <- fluidPage(    
+  
+  # Give the page a title
+  titlePanel("Percent Foliar Cover by Plot Type"),
+  
+  # Generate a row with a sidebar
+  sidebarLayout(      
+    
+    # Define the sidebar with one input
+    sidebarPanel(
+      selectInput(inputId = "PlotType", 
+                  label = "Select the Plot Type:", 
+                  choices=c("GRS","SAGE","PTF","OC"), 
+                  selected = "GRS"),
+    ),
+    
+    # Create a spot for the barplot
+    mainPanel(
+      plotOutput("FunctionalPlot")  
+    )
+    
+  )
+)
+
+# Define a server for the Shiny app
+server <- function(input, output) {
+  
+  reactive_data = reactive({
+    selected_plottype = input$PlotType
+    return(LPI_shiny2[LPI_shiny2$PlotType==selected_plottype,])
+    
+  })
+  
+
+  # Fill in the spot we created for a plot
+  output$FunctionalPlot <- renderPlot({
+    
+    our_data <- reactive_data()
+    
+    # Render a barplot
+    ggplot(data=our_data, mapping = aes(x=Functional_Group, y=Percent_Cover, fill=Functional_Group)) + 
+      geom_bar(stat="identity") + 
+      theme_bw() + 
+      theme(axis.text.x=element_text (angle =45, hjust =1)) + 
+      theme(legend.position="none") +
+      facet_wrap(~Location, scales="free_y")
+  
+           })
+}
+
+# Create Shiny app ----
+shinyApp(ui = ui, server = server)
+
+```
